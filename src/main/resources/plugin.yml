@@ -1,6 +1,8 @@
-name: Player Count
+name: PlayerCount
 version: '${version}'
 main: net.axxal.playercount.PlayerCount
 api-version: 1.18
 description: Send playercount through websocket server
 website: https://axxal.net
+author: AxxAL
+prefix: PlayerCount

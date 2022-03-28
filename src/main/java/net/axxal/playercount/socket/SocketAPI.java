@@ -8,50 +8,59 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-@ServerEndpoint(value = "/player-count")
+@ServerEndpoint(value = "/socket/player-count")
 public class SocketAPI implements Runnable {
 
+    private final PlayerCount plugin;
     private final PlayerManager playerManager;
     private boolean isRunning = false;
+    private Thread thread;
     private static List<Session> sessions;
 
     public SocketAPI(PlayerCount plugin) {
-        sessions = new ArrayList<Session>();
+        sessions = new ArrayList<>();
+        this.plugin = plugin;
         playerManager = plugin.playerManager;
     }
 
     @OnOpen
     public void onOpen(Session session) {
-        System.out.println("Socket opened.");
+        plugin.getLogger().info("Socket opened.");
         sessions.add(session);
     }
 
     @OnMessage
     public void onMessage(Session session, String message) {
-        System.out.printf("Message from socket %s: %s", session.getId(), message);
+        plugin.getLogger().info(String.format("Message from socket %s: %s", session.getId(), message));
     }
 
     @OnClose
     public void onClose(Session session) {
-        System.out.printf("Socket closed: id(%s)", session.getId());
+        plugin.getLogger().info(String.format("Socket with id %s closed", session.getId()));
         sessions.remove(session);
     }
 
     public static void broadcast(String message) {
         for (Session session : sessions) {
-            session.getAsyncRemote().sendText(message);
+            ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
+            session.getAsyncRemote().sendBinary(buffer);
         }
     }
 
     public void start() {
+        if (isRunning) return;
+        plugin.getLogger().info(String.format("Starting thread running socket on: 127.0.0.1:%d", plugin.getConfig().getInt("socket-port")));
         isRunning = true;
-        new Thread(this).start();
+        thread = new Thread(this);
+        thread.start();
     }
 
     public void stop() {
+        plugin.getLogger().info("Stopping socket thread.");
         isRunning = false;
     }
 
