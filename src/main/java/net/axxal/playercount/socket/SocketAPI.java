@@ -2,78 +2,78 @@ package net.axxal.playercount.socket;
 
 import net.axxal.playercount.PlayerCount;
 import net.axxal.playercount.PlayerManager;
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-@ServerEndpoint(value = "/socket/player-count")
-public class SocketAPI implements Runnable {
+public class SocketAPI extends WebSocketServer {
 
     private final PlayerCount plugin;
     private final PlayerManager playerManager;
-    private boolean isRunning = false;
-    private Thread thread;
-    private static List<Session> sessions;
 
-    public SocketAPI(PlayerCount plugin) {
-        sessions = new ArrayList<>();
+    public SocketAPI(int port, PlayerCount plugin) {
+        super(new InetSocketAddress(port));
         this.plugin = plugin;
-        playerManager = plugin.playerManager;
-    }
-
-    @OnOpen
-    public void onOpen(Session session) {
-        plugin.getLogger().info("Socket opened.");
-        sessions.add(session);
-    }
-
-    @OnMessage
-    public void onMessage(Session session, String message) {
-        plugin.getLogger().info(String.format("Message from socket %s: %s", session.getId(), message));
-    }
-
-    @OnClose
-    public void onClose(Session session) {
-        plugin.getLogger().info(String.format("Socket with id %s closed", session.getId()));
-        sessions.remove(session);
-    }
-
-    public static void broadcast(String message) {
-        for (Session session : sessions) {
-            ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
-            session.getAsyncRemote().sendBinary(buffer);
-        }
-    }
-
-    public void start() {
-        if (isRunning) return;
-        plugin.getLogger().info(String.format("Starting thread running socket on: 127.0.0.1:%d", plugin.getConfig().getInt("socket-port")));
-        isRunning = true;
-        thread = new Thread(this);
-        thread.start();
-    }
-
-    public void stop() {
-        plugin.getLogger().info("Stopping socket thread.");
-        isRunning = false;
+        playerManager = PlayerManager.getInstance(plugin);
     }
 
     @Override
-    public void run() {
-        while (isRunning) {
-            broadcast(String.valueOf(playerManager.getPlayerCount()));
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    public void onOpen(WebSocket conn, ClientHandshake handshake) {
+        conn.send("Connected!");
+        plugin.getSLF4JLogger().info(String.format("%s connected to the socket!", conn.getRemoteSocketAddress().getAddress().getHostAddress()));
+    }
+
+    @Override
+    public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+        plugin.getSLF4JLogger().info(String.format("%s disconnected from the socket!", conn.getRemoteSocketAddress().getAddress().getHostAddress()));
+    }
+
+    @Override
+    public void onMessage(WebSocket conn, String message) {
+        switch (message) {
+            case "ping":
+                conn.send("pong");
+            case "getPlayerCount":
+                conn.send(String.valueOf(playerManager.getPlayerCount()));
+                break;
+            case "getMaxPlayers":
+                conn.send(String.valueOf(playerManager.maxPlayerCount()));
+                break;
+            default:
+                conn.send("unknown action");
+                break;
         }
+    }
+
+    @Override
+    public void onError(WebSocket conn, Exception ex) {
+        ex.printStackTrace();
+    }
+
+
+    @Override
+    public void onStart() {
+        plugin.getSLF4JLogger().info(String.format("Socket server started! Listening on port %s", getPort()));
+    }
+
+    public void run() {
+        start();
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                plugin.getSLF4JLogger().info("Broadcasting player count to all connected clients!");
+                playerManager.updatePlayers();
+                ByteBuffer buffer = ByteBuffer.allocate(4);
+                buffer.putInt(playerManager.getPlayerCount());
+                broadcast(ByteBuffer.wrap(buffer.array()));
+            }
+        }, 0, 15 * 1000);
     }
 }
 

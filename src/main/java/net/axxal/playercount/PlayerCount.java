@@ -11,14 +11,14 @@ public final class PlayerCount extends JavaPlugin {
     @Override
     public void onEnable() {
         this.saveDefaultConfig();
-        playerManager = PlayerManager.getInstance();
+        playerManager = PlayerManager.getInstance(this);
         this.getServer().getPluginManager().registerEvents(new EventListener(this), this);
-        socketAPI = new SocketAPI(this);
-        socketAPI.start();
+        socketAPI = new SocketAPI(getConfig().getInt("socket-port"), this);
+        socketAPI.run();
     }
 
     @Override
     public void onDisable() {
-        socketAPI.stop();
+
     }
 }

@@ -6,36 +6,35 @@ import java.util.ArrayList;
 
 public class PlayerManager {
 
+    private PlayerCount plugin;
     private static PlayerManager instance;
-    private ArrayList<Player> players;
+    private final ArrayList<Player> players;
 
-    private PlayerManager() {
+    private PlayerManager(PlayerCount plugin) {
+        this.plugin = plugin;
         players = new ArrayList<Player>();
-    }
-
-    public Player addPlayer(Player player) {
-        if (!players.contains(player)) {
-            players.add(player);
-        }
-        return player;
-    }
-
-    public Player removePlayer(Player player) {
-        players.remove(player);
-        return player;
     }
 
     public ArrayList<Player> getPlayers() {
         return players;
     }
 
+    public void updatePlayers() {
+        players.clear();
+        players.addAll(plugin.getServer().getOnlinePlayers());
+    }
+
     public int getPlayerCount() {
         return players.size();
     }
 
-    public static PlayerManager getInstance() {
+    public int maxPlayerCount() {
+        return plugin.getServer().getMaxPlayers();
+    }
+
+    public static PlayerManager getInstance(PlayerCount plugin) {
         if (instance == null) {
-            instance = new PlayerManager();
+            instance = new PlayerManager(plugin);
         }
         return instance;
     }

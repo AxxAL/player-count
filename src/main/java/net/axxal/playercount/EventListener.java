@@ -15,12 +15,12 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        plugin.playerManager.addPlayer(event.getPlayer());
+        plugin.playerManager.updatePlayers();
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.playerManager.removePlayer(event.getPlayer());
+        plugin.playerManager.updatePlayers();
     }
 
 }
