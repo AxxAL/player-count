@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class PlayerManager {
 
-    private PlayerCount plugin;
+    private final PlayerCount plugin;
     private static PlayerManager instance;
     private final ArrayList<Player> players;
 

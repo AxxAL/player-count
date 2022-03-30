@@ -14,7 +14,7 @@ public final class PlayerCount extends JavaPlugin {
         playerManager = PlayerManager.getInstance(this);
         this.getServer().getPluginManager().registerEvents(new EventListener(this), this);
         socketAPI = new SocketAPI(getConfig().getInt("socket-port"), this);
-        socketAPI.run();
+        socketAPI.start();
     }
 
     @Override

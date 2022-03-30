@@ -7,20 +7,20 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class EventListener implements Listener {
 
-    private final PlayerCount plugin;
+    private final PlayerManager playerManager;
 
     public EventListener(PlayerCount plugin) {
-        this.plugin = plugin;
+        playerManager = PlayerManager.getInstance(plugin);
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        plugin.playerManager.updatePlayers();
+        playerManager.updatePlayers();
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.playerManager.updatePlayers();
+        playerManager.updatePlayers();
     }
 
 }
