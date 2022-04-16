@@ -31,7 +31,7 @@ public class ApiController implements IPluginAccess {
     // Handle the closing of the connection.
     public void handleClose(WebSocket conn, int code, boolean remote) {
         logger.info("{} closed connection from {}. Closing code [{}]",
-                remote ? "Remote" : "Host",
+                remote ? "Host" : "Remote",
                 conn.getRemoteSocketAddress().getAddress().getHostAddress(),
                 code
         );

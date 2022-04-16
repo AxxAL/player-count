@@ -14,7 +14,7 @@ public class ApiListener extends WebSocketServer implements IPluginAccess {
     private final ApiController controller;
 
     public ApiListener() {
-        super(new InetSocketAddress(plugin.getConfig().getInt("socket-port")));
+        super(new InetSocketAddress(plugin.getConfig().getInt("socket-api.port")));
         controller = new ApiController();
         logger = plugin.getSLF4JLogger();
     }

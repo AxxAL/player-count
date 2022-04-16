@@ -1,1 +1,11 @@
-socket-port: 7777
+socket-api:
+  port: 7777
+  authorized-remotes:
+    - "127.0.0.1"
+  requests:
+    get-player-list:
+      requires-authentication: true
+    get-player-count:
+      requires-authentication: false
+    get-max-player-count:
+      requires-authentication: false

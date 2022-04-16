@@ -9,6 +9,7 @@ public class GetPlayerListRequest extends AbstractRequest {
 
     public GetPlayerListRequest() {
         super("getPlayerList");
+        requiresAuthentication = plugin.getConfig().getBoolean("socket-api.requests.get-player-list.requires-authentication");
     }
 
     @Override

@@ -8,6 +8,7 @@ public class GetPlayerCountRequest extends AbstractRequest {
 
     public GetPlayerCountRequest() {
         super("getPlayerCount");
+        requiresAuthentication = plugin.getConfig().getBoolean("socket-api.requests.get-player-count.requires-authentication");
     }
 
     @Override
