@@ -4,11 +4,11 @@ import org.json.JSONObject;
 
 import java.time.Instant;
 
-public class APIResponse {
+public class ApiResponse {
 
     private final JSONObject json;
 
-    public APIResponse(String type, Object data) {
+    public ApiResponse(String type, Object data) {
         json = new JSONObject();
         json.put("type", type);
         json.put("data", data);

@@ -1,6 +1,6 @@
 package net.axxal.playercount;
 
-import net.axxal.playercount.api.APIListener;
+import net.axxal.playercount.api.ApiListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class PlayerCount extends JavaPlugin {
@@ -10,7 +10,7 @@ public final class PlayerCount extends JavaPlugin {
     @Override
     public void onEnable() {
         this.saveDefaultConfig();
-        APIListener apiListener = new APIListener(getConfig().getInt("socket-port"), this);
+        ApiListener apiListener = new ApiListener();
         listenerThread = new Thread(apiListener);
         listenerThread.start();
     }

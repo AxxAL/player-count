@@ -1,6 +1,6 @@
-package net.axxal.playercount.api.requests;
+package net.axxal.playercount.api;
 
-import net.axxal.playercount.api.IPluginAccess;
+import net.axxal.playercount.interfaces.IPluginAccess;
 import org.java_websocket.WebSocket;
 
 public abstract class AbstractRequest implements IPluginAccess {

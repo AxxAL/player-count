@@ -1,6 +1,6 @@
 package net.axxal.playercount.api;
 
-import net.axxal.playercount.PlayerCount;
+import net.axxal.playercount.interfaces.IPluginAccess;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -8,14 +8,14 @@ import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
 
-public class APIListener extends WebSocketServer {
+public class ApiListener extends WebSocketServer implements IPluginAccess {
 
     private final Logger logger;
-    private final APIController controller;
+    private final ApiController controller;
 
-    public APIListener(int port, PlayerCount plugin) {
-        super(new InetSocketAddress(port));
-        controller = new APIController(plugin);
+    public ApiListener() {
+        super(new InetSocketAddress(plugin.getConfig().getInt("socket-port")));
+        controller = new ApiController();
         logger = plugin.getSLF4JLogger();
     }
 
@@ -31,7 +31,7 @@ public class APIListener extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        controller.handleMessage(conn, message);
+        controller.handleRequest(conn, message);
     }
 
     @Override
